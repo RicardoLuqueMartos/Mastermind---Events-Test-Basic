@@ -25,7 +25,7 @@ public class AvailableColorSlot : MonoBehaviour, UsableObject
 
     void SelectColor(int colorIndex)
     {
-        boardManager.ResetColorsSelection();
+    //    boardManager.ResetColorsSelection();
 
         if (boardManager.Colors.selectedColorIndex != colorIndex)
         {
