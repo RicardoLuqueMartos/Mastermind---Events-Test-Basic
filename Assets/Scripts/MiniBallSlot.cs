@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MiniBallSlot : MonoBehaviour , UsableObject
+public class MiniBallSlot : MonoBehaviour
 {
 
     public GameObject ballGameObject;
@@ -10,8 +10,4 @@ public class MiniBallSlot : MonoBehaviour , UsableObject
     public GameObject bar;
     public int ballIndex;
 
-    public void UseObject(/*BoardManager boardManager*/)
-    {
-    //    boardManager.SelectColor(colorIndex);
-    }
 }

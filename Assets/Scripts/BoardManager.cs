@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static BoardManager;
 
 public class BoardManager : MonoBehaviour
 {
@@ -13,9 +12,11 @@ public class BoardManager : MonoBehaviour
 
     [SerializeField]
     int currentLine = 0;
+     public int CurrentLine { get { return currentLine;  } }
 
     [SerializeField]
     int currentSlot = -1;
+    public int CurrentSlot { get { return currentSlot; } }
 
     [Serializable]
     public class SlotData
@@ -257,11 +258,11 @@ public class BoardManager : MonoBehaviour
         }
     }
 
-    void AssignDefaultBoardColor(MeshRenderer renderer)
+    public void AssignDefaultBoardColor(MeshRenderer renderer)
     {
         renderer.material = Colors.DefaultBoardColor;
     }
-    void AssignSelectionColor(MeshRenderer renderer)
+    public void AssignSelectionColor(MeshRenderer renderer)
     {
         renderer.material = Colors.SelectedLineColor;
     }
@@ -286,57 +287,17 @@ public class BoardManager : MonoBehaviour
     #endregion Generate / Destroy Board
 
     #region Game Mechanics
+    public void SetCurrentSlot(int index)
+    {
+        currentSlot = index;
+    }
+
     void SetCurrentLineSelected()
     {
         for (int i = 0; i < board.linesList[currentLine].slotsList.Count; i++)
         {
             board.linesList[currentLine].slotsList[i].slotGameObject.GetComponent<MeshRenderer>().material = Colors.SelectedLineColor;
-
         }
-    }
-
-    public void SelectSlot(int SlotIndex)
-    {
-        if (currentSlot != -1)
-        {
-            AssignDefaultBoardColor(board.linesList[currentLine].slotsList[currentSlot].ballSlot.selectedCircle.GetComponent<MeshRenderer>());
-        }
-        if (currentSlot != SlotIndex)
-        {
-            currentSlot = SlotIndex;
-
-            AssignSelectionColor(board.linesList[currentLine].slotsList[currentSlot].ballSlot.selectedCircle.GetComponent<MeshRenderer>());
-        }
-        else currentSlot = -1;
-
-        AssignColorToSlot();
-    }
-
-    private void AssignColorToSlot()
-    {
-        if (Colors.selectedColorIndex != -1 && currentSlot != -1)
-        {
-            board.linesList[currentLine].slotsList[currentSlot].ballSlot.ballGameObject.GetComponent<MeshRenderer>().material
-                = Colors.ColorsList[Colors.GeneratedColorsObjectsList[Colors.selectedColorIndex].colorIndex];
-
-            board.linesList[currentLine].slotsList[currentSlot].ballSlot.ballGameObject.SetActive(true);
-        }
-
-        int ActiveAmount = 0;
-
-        // if all slots done
-        for (int i = 0; i < board.linesList[currentLine].slotsList.Count; i++)
-        {
-
-            if (board.linesList[currentLine].slotsList[i].ballSlot.ballGameObject.activeInHierarchy == true)
-            {
-                ActiveAmount = ActiveAmount + 1;
-            }
-        }
-
-        if(ActiveAmount == rules.slotsByLine)
-            ShowOkButton();
-
     }
 
     void PrepareOkButton()
@@ -358,36 +319,14 @@ public class BoardManager : MonoBehaviour
         board.OkButtonGameObject.SetActive(false);
     }
 
-    #region Select a color
-    public void SelectColor(int colorIndex)
-    {
-     /*   if (Colors.selectedColorIndex != -1)
-        {
-            AssignDefaultBoardColor(Colors.GeneratedColorsObjectsList[Colors.selectedColorIndex].selectedCircle.GetComponent<MeshRenderer>());
-        }*/
-
-        ResetColorsSelection();
-
-        if (Colors.selectedColorIndex != colorIndex)
-        {
-            Colors.selectedColorIndex = colorIndex;
-
-            AssignSelectionColor(Colors.GeneratedColorsObjectsList[colorIndex].selectedCircle.GetComponent<MeshRenderer>());
-        }
-        else Colors.selectedColorIndex = -1;
-
-        AssignColorToSlot();
-    }
-
-    void ResetColorsSelection()
+    public void ResetColorsSelection()
     {
         for (int i = 0; i < Colors.GeneratedColorsObjectsList.Count; i++)
         {
             AssignDefaultBoardColor(Colors.GeneratedColorsObjectsList[i].selectedCircle.GetComponent<MeshRenderer>());
         }
     }
-
-    #endregion Select a color
+    
     #endregion Game Mechanics
 
     #region IA Exchanges
@@ -418,8 +357,6 @@ public class BoardManager : MonoBehaviour
     
     private void VerifyLine()
     {
-        Debug.Log("VerifyLine");
-
         int CorrectSlots = 0;
         int WrongPlace = 0;
         int Repetition = 0;
@@ -432,6 +369,7 @@ public class BoardManager : MonoBehaviour
                 == iALine.slotsList[i].ballSlot.ballGameObject.GetComponent<MeshRenderer>().material.color)
             {               
                 CorrectSlots ++;
+
                 if (usedColorsList.Contains(iALine.slotsList[i].ballSlot.ballGameObject.GetComponent<MeshRenderer>().material.color) == false)                
                     usedColorsList.Add(iALine.slotsList[i].ballSlot.ballGameObject.GetComponent<MeshRenderer>().material.color);
                 else
@@ -446,6 +384,7 @@ public class BoardManager : MonoBehaviour
                     (board.linesList[currentLine].slotsList[i].ballSlot.ballGameObject.GetComponent<MeshRenderer>().material.color) == true)
                 {
                     WrongPlace++;
+
                     if (usedColorsList.Contains(iALine.slotsList[i].ballSlot.ballGameObject.GetComponent<MeshRenderer>().material.color) == false)
                         usedColorsList.Add(iALine.slotsList[i].ballSlot.ballGameObject.GetComponent<MeshRenderer>().material.color);
                     else
@@ -463,7 +402,7 @@ public class BoardManager : MonoBehaviour
         for (int i = 0; i < board.linesList[currentLine].miniSlotsXManager.MiniBallSlotsList.Count; i++)
         {
             int i1 = (i + CorrectSlots);
-            int i2 = (WrongPlace + CorrectSlots);
+            int i2 = (WrongPlace + CorrectSlots+ Repetition);
 
             if (i < CorrectSlots)
             {
@@ -520,7 +459,7 @@ public class BoardManager : MonoBehaviour
         slot.slotGameObject.GetComponent<Collider>().enabled = false;
     }
 
-    private void ShowOkButton()
+    public void ShowOkButton()
     {
         board.OkButtonGameObject.SetActive(true);
     }

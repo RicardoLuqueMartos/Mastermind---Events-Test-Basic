@@ -11,9 +11,11 @@ public class ValidateLineButton : MonoBehaviour, UsableObject
     public static event MessageEvent ValidateLine;
 
     // Start is called before the first frame update
-    public void UseObject()
+    public void UseObject(BoardManager boardManager)
     {
         ValidateLine?.Invoke();
     }
+
+
 
 }
