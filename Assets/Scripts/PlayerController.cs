@@ -25,7 +25,7 @@ public class PlayerController : MonoBehaviour
             if (Input.GetMouseButtonDown(0)
                 && hit.transform.GetComponent<UsableObject>() != null)
             {
-                hit.transform.GetComponent<UsableObject>().UseObject(GlobalVariables.boardManager);
+                hit.transform.GetComponent<UsableObject>().UseObject(/*GlobalVariables.boardManager*/);
                     
             }
         }

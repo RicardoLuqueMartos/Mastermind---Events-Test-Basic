@@ -10,7 +10,7 @@ public class MiniBallSlot : MonoBehaviour , UsableObject
     public GameObject bar;
     public int ballIndex;
 
-    public void UseObject(BoardManager boardManager)
+    public void UseObject(/*BoardManager boardManager*/)
     {
     //    boardManager.SelectColor(colorIndex);
     }

@@ -4,5 +4,5 @@ using UnityEngine;
 
 public interface UsableObject
 {
-    public void UseObject(BoardManager boardManager) { }
+    public void UseObject(/*BoardManager boardManager*/) { }
 }

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BallSlot : MonoBehaviour , UsableObject
+public class BallSlot : MonoBehaviour, UsableObject
 {
 
     public GameObject ballGameObject;
@@ -15,8 +15,8 @@ public class BallSlot : MonoBehaviour , UsableObject
 
     }
 
-    public void UseObject(BoardManager boardManager)
+    public void UseObject(/*BoardManager boardManager*/)
     {        
-        boardManager.SelectSlot(ballIndex);
+        GlobalVariables.boardManager.SelectSlot(ballIndex);
     }
 }

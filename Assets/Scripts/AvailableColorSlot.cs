@@ -11,8 +11,8 @@ public class AvailableColorSlot : MonoBehaviour, UsableObject
     public GameObject bar2;
     public int colorIndex;
 
-    public void UseObject(BoardManager boardManager) {
+    public void UseObject(/*BoardManager boardManager*/) {
 
-        boardManager.SelectColor(colorIndex);
+        GlobalVariables.boardManager.SelectColor(colorIndex);
     }
 }
