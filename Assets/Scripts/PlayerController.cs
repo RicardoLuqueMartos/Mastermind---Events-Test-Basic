@@ -7,12 +7,12 @@ public class PlayerController : MonoBehaviour
     RaycastHit hit;
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         CastRay();
     }
-       
-    void CastRay()
+
+    private void CastRay()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit, 100))

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 
 public class UIManager : MonoBehaviour
 {
@@ -16,25 +17,37 @@ public class UIManager : MonoBehaviour
 
     void OnEnable()
     {
+        WinPanel.SetActive(false); 
+        LoosePanel.SetActive(false);
+
         //C# : on inscrit la fonction LooseMessage à l'event
-        //grace à la propriété static nous devons juste trouver la classe
         AIController.WinGame += ShowWinPanel;
         AIController.LooseGame += ShowLoosePanel;
     }
 
     private void ShowWinPanel()
-    {
-        Debug.Log("ShowWinPanel");
+    {       
         WinPanel.SetActive(true);
     }
 
     private void ShowLoosePanel()
-    {
+    {       
         LoosePanel.SetActive(true);
     }
 
     public void Restart()
-    {     
+    {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void Quit()
+    {
+        Application.Quit();
+    }
+
+    private void OnDisable()
+    {
+        AIController.WinGame -= ShowWinPanel;
+        AIController.LooseGame -= ShowLoosePanel;
     }
 }

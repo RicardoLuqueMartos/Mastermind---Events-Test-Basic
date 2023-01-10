@@ -23,13 +23,13 @@ public class AvailableColorSlot : MonoBehaviour, UsableObject
 
     void SelectColor(int colorIndex)
     {    
-        boardManager.ResetColorsSelection();
+   //     boardManager.ResetColorsSelection();
 
         if (boardManager.Colors.selectedColorIndex != colorIndex)
         {
             boardManager.Colors.selectedColorIndex = colorIndex;
 
-            boardManager.AssignSelectionColor(boardManager.Colors.GeneratedColorsObjectsList[colorIndex].selectedCircle.GetComponent<MeshRenderer>());
+        //    AssignSelectionColor(boardManager.Colors.GeneratedColorsObjectsList[colorIndex].selectedCircle.GetComponent<MeshRenderer>());
         }
         else boardManager.Colors.selectedColorIndex = -1;
 
@@ -40,27 +40,45 @@ public class AvailableColorSlot : MonoBehaviour, UsableObject
     {
         if (boardManager.Colors.selectedColorIndex != -1 && boardManager.CurrentSlot != -1)
         {
-            boardManager.board.linesList[boardManager.CurrentLine].slotsList[boardManager.CurrentSlot].ballGameObject.GetComponent<MeshRenderer>().material
-                = boardManager.Colors.ColorsList[boardManager.Colors.GeneratedColorsObjectsList[boardManager.Colors.selectedColorIndex].colorIndex];
+            boardManager.Board.linesList[boardManager.CurrentLine].slotsList[boardManager.CurrentSlot].AssignMaterialToBall(
+                boardManager.Colors.ColorsList[boardManager.Colors.GeneratedColorsObjectsList[boardManager.Colors.selectedColorIndex].colorIndex]);
 
-            boardManager.board.linesList[boardManager.CurrentLine].slotsList[boardManager.CurrentSlot].ballGameObject.SetActive(true);
+            boardManager.Board.linesList[boardManager.CurrentLine].slotsList[boardManager.CurrentSlot].ActivateBallGameObject();
         }
 
         int ActiveAmount = 0;
 
         // if all slots done
-        for (int i = 0; i < boardManager.board.linesList[boardManager.CurrentLine].slotsList.Count; i++)
+        for (int i = 0; i < boardManager.Board.linesList[boardManager.CurrentLine].slotsList.Count; i++)
         {
 
-            if (boardManager.board.linesList[boardManager.CurrentLine].slotsList[i].ballGameObject.activeInHierarchy == true)
+            if (boardManager.Board.linesList[boardManager.CurrentLine].slotsList[i].IsBallActiveInHierarchy())
             {
                 ActiveAmount = ActiveAmount + 1;
             }
         }
 
-        if (ActiveAmount == boardManager.rules.slotsByLine)
+        if (ActiveAmount == boardManager.Rules.slotsByLine)
             boardManager.ShowOkButton();
 
     }
 
+    public void AssignDefaultBoardColor(BoardManager _boardManager)
+    {
+        boardManager = _boardManager;
+
+        AssignDefaultBoardColor(transform.GetComponent<MeshRenderer>());
+        AssignDefaultBoardColor(selectedCircle.GetComponent<MeshRenderer>());
+        AssignDefaultBoardColor(bar1.GetComponent<MeshRenderer>());
+        AssignDefaultBoardColor(bar2.GetComponent<MeshRenderer>());
+    }
+
+    public void AssignDefaultBoardColor(MeshRenderer renderer)
+    {
+        renderer.material = boardManager.Colors.DefaultBoardColor;
+    }
+    public void AssignSelectionColor(MeshRenderer renderer)
+    {
+        renderer.material = boardManager.Colors.SelectedLineColor;
+    }
 }

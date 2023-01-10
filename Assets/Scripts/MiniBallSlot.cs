@@ -10,4 +10,5 @@ public class MiniBallSlot : MonoBehaviour
     public GameObject bar;
     public int ballIndex;
 
+   
 }

@@ -3,16 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SlotData : MonoBehaviour, UsableObject
+public class SlotData : SlotBase, UsableObject
 {
     #region Variables
-    BoardManager boardManager;
-
-    public GameObject ballGameObject;
-    public GameObject selectedCircle;
-    public GameObject bar;
-
-    public int ballIndex;
+    
     public int indexAssignedColor;
 
     #endregion Variables
@@ -27,18 +21,41 @@ public class SlotData : MonoBehaviour, UsableObject
     {
         if (boardManager.CurrentSlot != -1)
         {
-            boardManager.AssignDefaultBoardColor(boardManager.board.linesList[boardManager.CurrentLine].slotsList
+            AssignDefaultBoardColor(boardManager.Board.linesList[boardManager.CurrentLine].slotsList
                 [boardManager.CurrentSlot].selectedCircle.GetComponent<MeshRenderer>());
         }
         if (boardManager.CurrentSlot != SlotIndex)
         {
             boardManager.SetCurrentSlot(SlotIndex);
 
-            boardManager.AssignSelectionColor(boardManager.board.linesList
+            AssignSelectionColor(boardManager.Board.linesList
                 [boardManager.CurrentLine].slotsList[boardManager.CurrentSlot].selectedCircle.GetComponent<MeshRenderer>());
         }
         else boardManager.SetCurrentSlot(-1);
+    }
 
-        boardManager.ResetColorsSelection();
+    public void DisableSlot()
+    {
+        // Disable slot
+        AssignDefaultBoardColor(selectedCircle.GetComponent<MeshRenderer>());
+        transform.GetComponent<Collider>().enabled = false;
+    }
+
+    public void AssignDefaultBoardColor(BoardManager _boardManager)
+    {
+        boardManager = _boardManager;
+
+        AssignDefaultBoardColor(transform.GetComponent<MeshRenderer>());
+        AssignDefaultBoardColor(selectedCircle.GetComponent<MeshRenderer>());
+        AssignDefaultBoardColor(bar.GetComponent<MeshRenderer>());
+    }
+
+    public void AssignDefaultBoardColor(MeshRenderer renderer)
+    {
+        renderer.material = boardManager.Colors.DefaultBoardColor;
+    }
+    public void AssignSelectionColor(MeshRenderer renderer)
+    {
+        renderer.material = boardManager.Colors.SelectedLineColor;
     }
 }

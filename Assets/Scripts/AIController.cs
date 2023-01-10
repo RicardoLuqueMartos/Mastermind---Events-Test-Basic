@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using UnityEngine;
+using UnityEngine.iOS;
 
 public class AIController : MonoBehaviour
 {
@@ -13,20 +15,51 @@ public class AIController : MonoBehaviour
     public delegate void MessageEvent();
     public static event MessageEvent WinGame;
     public static event MessageEvent LooseGame;
+    public static event MessageEvent SelectNextLine;
 
     #endregion Events
 
-   
+
     // Start is called before the first frame update
-    void OnEnable()
+    private void OnEnable()
     {
         if (boardManager == null)       
             boardManager = FindObjectOfType<BoardManager>();
 
-
         //C# : on inscrit la fonction LooseMessage à l'event
-        //grace à la propriété static nous devons juste trouver la classe
         ValidateLineButton.ValidateLine += VerifyLine;
+        BoardManager.BoardGenerated += Init;
+
+    }
+
+    void Init()
+    {
+        Debug.Log("Init");
+        if (boardManager.TestMode == false)
+            HideIABoard();
+
+        GenerateCode();
+    }
+
+    void HideIABoard()
+    {
+        boardManager.IALine.iALineGameObject.SetActive(false);
+    }
+    public void GenerateCode()
+    {
+        for (int i = 0; i < boardManager.Rules.slotsByLine; i++)
+        {
+            if (boardManager.Colors.ColorsList.Count > 0)
+            {
+                // ran material
+                int ran = UnityEngine.Random.Range(1, boardManager.Colors.ColorsList.Count);
+                boardManager.IALine.slotsList[i].AssignMaterialToBall(boardManager.Colors.ColorsList[ran]);
+                boardManager.IALine.slotsList[i].indexAssignedColor = ran;
+                boardManager.IALine.slotsList[i].ActivateBallGameObject();
+
+                boardManager.IALine.AssignedColorsList.Add(boardManager.Colors.ColorsList[ran].color);
+            }
+        }
     }
     private void VerifyLine()
     {
@@ -39,94 +72,105 @@ public class AIController : MonoBehaviour
 
         List<Color> usedColorsList = new List<Color>();
 
-        for (int i = 0; i < boardManager.board.linesList[boardManager.CurrentLine].slotsList.Count; i++)
+        for (int i = 0; i < boardManager.Board.linesList[boardManager.CurrentLine].slotsList.Count; i++)
         {
-            if (boardManager == null) Debug.Log("boardManager");
-            else if (boardManager.board == null) Debug.Log("boardManager.board");
-            else if (boardManager.board.linesList[boardManager.CurrentLine] == null) Debug.Log("boardManager.board.linesList[boardManager.CurrentLine]");
-            else if (boardManager.board.linesList[boardManager.CurrentLine].slotsList[i] == null) Debug.Log("boardManager.board.linesList[boardManager.CurrentLine].slotsList[i]");
-            else if (boardManager.board.linesList[boardManager.CurrentLine].slotsList[i].ballGameObject == null) Debug.Log("boardManager.board.linesList[boardManager.CurrentLine].slotsList[i].ballGameObject");
-            else if (boardManager.board.linesList[boardManager.CurrentLine].slotsList[i].ballGameObject.GetComponent<MeshRenderer>() == null) Debug.Log("boardManager.board.linesList[boardManager.CurrentLine].slotsList[i].ballGameObject.GetComponent<MeshRenderer>()");
-            else if (boardManager.board.linesList[boardManager.CurrentLine].slotsList[i].ballGameObject.GetComponent<MeshRenderer>().material == null) Debug.Log("boardManager.board.linesList[boardManager.CurrentLine].slotsList[i].ballGameObject.GetComponent<MeshRenderer>().material");
-            else if (boardManager.iALine == null) Debug.Log(" boardManager.iALine");
-            else if (boardManager.iALine.slotsList[i] == null) Debug.Log("boardManager.iALine.slotsList[i]");
-            else if (boardManager.iALine.slotsList[i].ballGameObject == null) Debug.Log("boardManager.iALine.slotsList[i].ballGameObject");
-            else if (boardManager.iALine.slotsList[i].ballGameObject.GetComponent<MeshRenderer>() == null) Debug.Log("boardManager.iALine.slotsList[i].ballGameObject.GetComponent<MeshRenderer>()");
-            else if (boardManager.iALine.slotsList[i].ballGameObject.GetComponent<MeshRenderer>().material == null) Debug.Log("boardManager.iALine.slotsList[i].ballGameObject.GetComponent<MeshRenderer>().material");
+            Color iABallColor = boardManager.IALine.slotsList[i].GetBallColor();
+            Color BallColor = boardManager.Board.linesList[boardManager.CurrentLine].slotsList[i].GetBallColor();
 
-            if (boardManager.board.linesList[boardManager.CurrentLine].slotsList[i].ballGameObject.GetComponent<MeshRenderer>().material.color
-                == boardManager.iALine.slotsList[i].ballGameObject.GetComponent<MeshRenderer>().material.color)
+            if (BallColor == iABallColor)
             {
                 CorrectSlots++;
 
-                if (usedColorsList.Contains(boardManager.iALine.slotsList[i].ballGameObject.GetComponent<MeshRenderer>().material.color) == false)
-                    usedColorsList.Add(boardManager.iALine.slotsList[i].ballGameObject.GetComponent<MeshRenderer>().material.color);
-                else
-                {
-                    //    Repetition++;
-                }
+                if (usedColorsList.Contains(iABallColor) == false)
+                    usedColorsList.Add(iABallColor);
+                
             }
             else
             {
                 // color correct but wrong place
-                if (boardManager.iALine.AssignedColorsList.Contains
-                    (boardManager.board.linesList[boardManager.CurrentLine].slotsList[i].ballGameObject.GetComponent<MeshRenderer>().material.color) == true)
+                if (boardManager.IALine.AssignedColorsList.Contains(BallColor) == true)
                 {
                     WrongPlace++;
 
-                    if (usedColorsList.Contains(boardManager.iALine.slotsList[i].ballGameObject.GetComponent<MeshRenderer>().material.color) == false)
-                        usedColorsList.Add(boardManager.iALine.slotsList[i].ballGameObject.GetComponent<MeshRenderer>().material.color);
+                    if (usedColorsList.Contains(iABallColor) == false)
+                        usedColorsList.Add(iABallColor);
                     else
                     {
                         Repetition++;
                     }
-
-                    //   usedColorsList.Add(iALine.slotsList[i].ballSlot.ballGameObject.GetComponent<MeshRenderer>().material.color);
                 }
             }
             // disable slot
-            boardManager.DisableSlot(boardManager.board.linesList[boardManager.CurrentLine].slotsList[i]);
+            boardManager.Board.linesList[boardManager.CurrentLine].slotsList[i].DisableSlot();
         }
-        // set balls
-        for (int i = 0; i < boardManager.board.linesList[boardManager.CurrentLine].miniSlotsXManager.MiniBallSlotsList.Count; i++)
+        
+        // set mini balls X
+        for (int i = 0; i < boardManager.Board.linesList[boardManager.CurrentLine].miniSlotsXManager.MiniBallSlotsList.Count; i++)
         {
             int i1 = (i + CorrectSlots);
             int i2 = (WrongPlace + CorrectSlots + Repetition);
 
-            if (i < CorrectSlots)
+            if (i2 > 0)
             {
-                boardManager.board.linesList[boardManager.CurrentLine].miniSlotsXManager.MiniBallSlotsList[i].ballGameObject.GetComponent<MeshRenderer>().material
-                        = boardManager.Colors.BlackColor;
+                if (i < CorrectSlots)
+                {
+                    boardManager.Board.linesList[boardManager.CurrentLine].miniSlotsXManager.MiniBallSlotsList[i].ballGameObject.GetComponent<MeshRenderer>().material
+                            = boardManager.Colors.BlackColor;
 
-                boardManager.board.linesList[boardManager.CurrentLine].miniSlotsXManager.MiniBallSlotsList[i].ballGameObject.SetActive(true);
+                    boardManager.Board.linesList[boardManager.CurrentLine].miniSlotsXManager.MiniBallSlotsList[i].ballGameObject.SetActive(true);
+                }
+                else if (i1 - 1 < i2)
+                {
+                    boardManager.Board.linesList[boardManager.CurrentLine].miniSlotsXManager.MiniBallSlotsList[i].ballGameObject.GetComponent<MeshRenderer>().material
+                            = boardManager.Colors.WhiteColor;
+
+                    boardManager.Board.linesList[boardManager.CurrentLine].miniSlotsXManager.MiniBallSlotsList[i].ballGameObject.SetActive(true);
+                }
             }
-            else if (i1 - 1 < i2)
-            {
-                boardManager.board.linesList[boardManager.CurrentLine].miniSlotsXManager.MiniBallSlotsList[i].ballGameObject.GetComponent<MeshRenderer>().material
-                        = boardManager.Colors.WhiteColor;
-
-                boardManager.board.linesList[boardManager.CurrentLine].miniSlotsXManager.MiniBallSlotsList[i].ballGameObject.SetActive(true);
-            }
-
-            Debug.Log(CorrectSlots + " / " + WrongPlace + " _ i = " + i
-               + " _ i + CorrectSlots =" + i1 + " / CorrectSlots + WrongPlace =" + i2);
-
+       //     Debug.Log(CorrectSlots + " / " + WrongPlace + " / " + Repetition + " _ i = " + i
+        //       + " _ i + CorrectSlots =" + i1 + " / CorrectSlots + WrongPlace + Repetition =" + i2);
         }
 
-        // win game
-        if (CorrectSlots == boardManager.rules.slotsByLine)
+        // win game ?
+        if (CorrectSlots == boardManager.Rules.slotsByLine)
         {
-            Debug.Log("win");
-            WinGame?.Invoke();
+            Win();
         }
-        else if (boardManager.CurrentLine == boardManager.rules.linesByBoard
-            && CorrectSlots == boardManager.rules.slotsByLine)
+        else if (boardManager.CurrentLine == boardManager.Rules.linesByBoard
+            && CorrectSlots == boardManager.Rules.slotsByLine)
         {
-            LooseGame?.Invoke();
+            Loose();
         }
         else
         {
-            boardManager.SelectNextLine();
+            GoToNextLine();
         }
+    }
+    private void GoToNextLine()
+    {
+        SelectNextLine?.Invoke();
+    }
+
+    private void ShowIABoard()
+    {
+        boardManager.IALine.iALineGameObject.SetActive(true);
+    }
+
+    private void Win()
+    {
+        ShowIABoard();
+        WinGame?.Invoke();
+    }
+
+    private void Loose()
+    {
+        LooseGame?.Invoke();
+    }
+
+    private void OnDisable()
+    {
+        ValidateLineButton.ValidateLine -= VerifyLine;
+        BoardManager.BoardGenerated -= Init;
+
     }
 }
