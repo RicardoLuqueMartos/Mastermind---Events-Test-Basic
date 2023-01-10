@@ -16,14 +16,15 @@ public class UIManager : MonoBehaviour
 
     void OnEnable()
     {
-        //C# : on inscrit la fonction LooseMessage à l'event OnLoose.
-        //grace à la propriété static nous devons juste trouver la classe Board
-        BoardManager.WinGame += ShowWinPanel;
-        BoardManager.LooseGame += ShowLoosePanel;
+        //C# : on inscrit la fonction LooseMessage à l'event
+        //grace à la propriété static nous devons juste trouver la classe
+        AIController.WinGame += ShowWinPanel;
+        AIController.LooseGame += ShowLoosePanel;
     }
 
     private void ShowWinPanel()
     {
+        Debug.Log("ShowWinPanel");
         WinPanel.SetActive(true);
     }
 
@@ -33,7 +34,7 @@ public class UIManager : MonoBehaviour
     }
 
     public void Restart()
-    {
+    {     
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

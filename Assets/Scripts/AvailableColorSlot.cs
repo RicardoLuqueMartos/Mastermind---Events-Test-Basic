@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using UnityEngine;
 
 public class AvailableColorSlot : MonoBehaviour, UsableObject
@@ -18,14 +17,13 @@ public class AvailableColorSlot : MonoBehaviour, UsableObject
 
     public void UseObject(BoardManager _boardManager) 
     {
-        Debug.Log("AvailableColorSlot UseObject");
         boardManager = _boardManager;
         SelectColor(colorIndex);
     }
 
     void SelectColor(int colorIndex)
-    {
-    //    boardManager.ResetColorsSelection();
+    {    
+        boardManager.ResetColorsSelection();
 
         if (boardManager.Colors.selectedColorIndex != colorIndex)
         {
@@ -42,10 +40,10 @@ public class AvailableColorSlot : MonoBehaviour, UsableObject
     {
         if (boardManager.Colors.selectedColorIndex != -1 && boardManager.CurrentSlot != -1)
         {
-            boardManager.board.linesList[boardManager.CurrentLine].slotsList[boardManager.CurrentSlot].ballSlot.ballGameObject.GetComponent<MeshRenderer>().material
+            boardManager.board.linesList[boardManager.CurrentLine].slotsList[boardManager.CurrentSlot].ballGameObject.GetComponent<MeshRenderer>().material
                 = boardManager.Colors.ColorsList[boardManager.Colors.GeneratedColorsObjectsList[boardManager.Colors.selectedColorIndex].colorIndex];
 
-            boardManager.board.linesList[boardManager.CurrentLine].slotsList[boardManager.CurrentSlot].ballSlot.ballGameObject.SetActive(true);
+            boardManager.board.linesList[boardManager.CurrentLine].slotsList[boardManager.CurrentSlot].ballGameObject.SetActive(true);
         }
 
         int ActiveAmount = 0;
@@ -54,7 +52,7 @@ public class AvailableColorSlot : MonoBehaviour, UsableObject
         for (int i = 0; i < boardManager.board.linesList[boardManager.CurrentLine].slotsList.Count; i++)
         {
 
-            if (boardManager.board.linesList[boardManager.CurrentLine].slotsList[i].ballSlot.ballGameObject.activeInHierarchy == true)
+            if (boardManager.board.linesList[boardManager.CurrentLine].slotsList[i].ballGameObject.activeInHierarchy == true)
             {
                 ActiveAmount = ActiveAmount + 1;
             }

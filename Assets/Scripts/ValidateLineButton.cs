@@ -15,7 +15,4 @@ public class ValidateLineButton : MonoBehaviour, UsableObject
     {
         ValidateLine?.Invoke();
     }
-
-
-
 }

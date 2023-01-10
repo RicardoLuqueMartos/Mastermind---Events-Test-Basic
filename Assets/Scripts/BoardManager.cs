@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class BoardManager : MonoBehaviour
@@ -19,29 +20,12 @@ public class BoardManager : MonoBehaviour
     public int CurrentSlot { get { return currentSlot; } }
 
     [Serializable]
-    public class SlotData
-    {
-        public GameObject slotGameObject;
-        public BallSlot ballSlot;
-        public int indexAssignedColor;
-    }
-
-    [Serializable]
-    public class LineData
-    {
-        public List<SlotData> slotsList = new List<SlotData>();
-        public List<int> LineColorsIndexList = new List<int>();
-        public List<SlotData> miniSlotsList = new List<SlotData>();
-        public MiniSlotsXManager miniSlotsXManager;
-    //    public GameObject lineGameObject;
-    }
-
-    [Serializable]
     public class BoardData
     {
         public List<LineData> linesList = new List<LineData>();
         public GameObject boardGameObject;
         public GameObject OkButtonGameObject;
+
     }
     public BoardData board = new BoardData();
 
@@ -123,7 +107,7 @@ public class BoardManager : MonoBehaviour
     {
         //C# : on inscrit la fonction LooseMessage à l'event OnLoose.
         //grace à la propriété static nous devons juste trouver la classe Board
-        ValidateLineButton.ValidateLine += VerifyLine;
+    //    ValidateLineButton.ValidateLine += VerifyLine;
     }
 
     #endregion Init
@@ -137,41 +121,39 @@ public class BoardManager : MonoBehaviour
         board.boardGameObject.transform.SetParent(transform);
 
         for (int iLine = 0; iLine < rules.linesByBoard; iLine++)
-        {
+        {            
+            // create a line
             GameObject newlineObj = new GameObject();
             newlineObj.transform.SetParent(board.boardGameObject.transform);
             newlineObj.name = "line "+ iLine;
+            LineData newline = newlineObj.AddComponent<LineData>();
 
-            BoardLine boardLine = newlineObj.AddComponent<BoardLine>();
-
-            // create a line
-            LineData newLine = new LineData();
-            board.linesList.Add(newLine);
+            board.linesList.Add(newline);
 
             for (int iSlot = 0; iSlot < rules.slotsByLine; iSlot++)
             {
-                SlotData newSlot = new SlotData();
               
                 Vector3 newPosition = new Vector3(firstSlotPosition.x+iSlot, firstSlotPosition.y+iLine, firstSlotPosition.z);
 
                 // create object in scene
-                newSlot.slotGameObject = (GameObject)Instantiate(prefabs.slotPrefab, newPosition, prefabs.slotPrefab.transform.rotation,
+                GameObject newSlotObj = (GameObject)Instantiate(prefabs.slotPrefab, newPosition, prefabs.slotPrefab.transform.rotation,
                      newlineObj.transform);
-                newSlot.slotGameObject.name = "Ball Slot " + iSlot;
+                SlotData newSlot = newSlotObj.GetComponent<SlotData>();
+                newSlotObj.name = "Ball Slot " + iSlot;
 
-                newSlot.ballSlot = newSlot.slotGameObject.GetComponent<BallSlot>();
-                newSlot.ballSlot.ballIndex = iSlot;
+             //   newSlot.ballSlot = newSlot.slotGameObject.GetComponent<BallSlot>();
+                newSlot.ballIndex = iSlot;
 
                 // add slot to the list
                 board.linesList[iLine].slotsList.Add(newSlot);
 
                 // set color
-                AssignDefaultBoardColor(newSlot.slotGameObject.GetComponent<MeshRenderer>());
-                AssignDefaultBoardColor(newSlot.ballSlot.selectedCircle.GetComponent<MeshRenderer>());
-                AssignDefaultBoardColor(newSlot.ballSlot.bar.GetComponent<MeshRenderer>());
+                AssignDefaultBoardColor(newSlot.GetComponent<MeshRenderer>());
+                AssignDefaultBoardColor(newSlot.selectedCircle.GetComponent<MeshRenderer>());
+                AssignDefaultBoardColor(newSlot.bar.GetComponent<MeshRenderer>());
 
                 // hide ball
-                newSlot.ballSlot.ballGameObject.SetActive(false);
+                newSlot.ballGameObject.SetActive(false);
 
                 // generate MiniSlotsX
                 if (iSlot == rules.slotsByLine-1)
@@ -185,19 +167,19 @@ public class BoardManager : MonoBehaviour
                        newlineObj.transform);
                     slotGameObject.name = "MiniSlotsX";
 
-                    newLine.miniSlotsXManager = slotGameObject.GetComponent<MiniSlotsXManager>();
+                    newline.miniSlotsXManager = slotGameObject.GetComponent<MiniSlotsXManager>();
 
                     // set color
-                    AssignDefaultBoardColor(newLine.miniSlotsXManager.bar.GetComponent<MeshRenderer>());
-                    AssignDefaultBoardColor(newLine.miniSlotsXManager.transform.GetComponent<MeshRenderer>());
+                    AssignDefaultBoardColor(newline.miniSlotsXManager.bar.GetComponent<MeshRenderer>());
+                    AssignDefaultBoardColor(newline.miniSlotsXManager.transform.GetComponent<MeshRenderer>());
 
 
-                    for (int iminiSlot = 0; iminiSlot < newLine.miniSlotsXManager.MiniBallSlotsList.Count; iminiSlot++)
+                    for (int iminiSlot = 0; iminiSlot < newline.miniSlotsXManager.MiniBallSlotsList.Count; iminiSlot++)
                     {
-                        newLine.miniSlotsXManager.MiniBallSlotsList[iminiSlot].selectedCircle.transform.GetComponent<MeshRenderer>().material 
+                        newline.miniSlotsXManager.MiniBallSlotsList[iminiSlot].selectedCircle.transform.GetComponent<MeshRenderer>().material 
                             = Colors.DefaultBoardColor;
 
-                        newLine.miniSlotsXManager.MiniBallSlotsList[iminiSlot].ballGameObject.SetActive(false);
+                        newline.miniSlotsXManager.MiniBallSlotsList[iminiSlot].ballGameObject.SetActive(false);
                     }
 
                     // show object
@@ -205,7 +187,6 @@ public class BoardManager : MonoBehaviour
                 }
             }
         }
-
         PrepareOkButton();
     }
 
@@ -219,22 +200,20 @@ public class BoardManager : MonoBehaviour
         HideIABoard();
 
         for (int iSlot = 0; iSlot < rules.slotsByLine; iSlot++)
-        {
-            SlotData newSlot = new SlotData();
-           
+        {          
             // prepare position
             Vector3 newPosition = new Vector3(firstSlotPosition.x + iSlot, firstSlotPosition.y + (rules.linesByBoard+1), firstSlotPosition.z);
 
             // create object in scene
-            newSlot.slotGameObject = (GameObject)Instantiate(prefabs.slotPrefab, newPosition, prefabs.slotPrefab.transform.rotation,
+            GameObject newSlotObj = (GameObject)Instantiate(prefabs.slotPrefab, newPosition, prefabs.slotPrefab.transform.rotation,
                 iALine.iALineGameObject.transform);
 
-            newSlot.ballSlot = newSlot.slotGameObject.GetComponent<BallSlot>();
+            SlotData newSlot = newSlotObj.GetComponent<SlotData>();
 
             // set color
-            AssignDefaultBoardColor(newSlot.slotGameObject.GetComponent<MeshRenderer>());
-            AssignDefaultBoardColor(newSlot.ballSlot.selectedCircle.GetComponent<MeshRenderer>());
-            AssignDefaultBoardColor(newSlot.ballSlot.bar.GetComponent<MeshRenderer>());
+            AssignDefaultBoardColor(newSlot.GetComponent<MeshRenderer>());
+            AssignDefaultBoardColor(newSlot.selectedCircle.GetComponent<MeshRenderer>());
+            AssignDefaultBoardColor(newSlot.bar.GetComponent<MeshRenderer>());
 
             iALine.slotsList.Add(newSlot);
         }
@@ -310,7 +289,7 @@ public class BoardManager : MonoBehaviour
     {
         for (int i = 0; i < board.linesList[currentLine].slotsList.Count; i++)
         {
-            board.linesList[currentLine].slotsList[i].slotGameObject.GetComponent<MeshRenderer>().material = Colors.SelectedLineColor;
+            board.linesList[currentLine].slotsList[i].transform.GetComponent<MeshRenderer>().material = Colors.SelectedLineColor;
         }
     }
 
@@ -348,10 +327,12 @@ public class BoardManager : MonoBehaviour
     {
         return currentLine;
     }
-    public List<int> GetCurrentLineContent()
+
+     public List<Color> GetCurrentLineContent()
     {
-        return board.linesList[currentLine].LineColorsIndexList;
+        return board.linesList[currentLine].LineColorsList;
     }
+
     public void GenerateCode()
     {
         for (int i = 0; i < rules.slotsByLine; i++)
@@ -360,15 +341,15 @@ public class BoardManager : MonoBehaviour
             {
                 // ran material
                 int ran = UnityEngine.Random.Range(1, Colors.ColorsList.Count);
-                iALine.slotsList[i].ballSlot.ballGameObject.GetComponent<MeshRenderer>().material = Colors.ColorsList[ran];
+                iALine.slotsList[i].ballGameObject.GetComponent<MeshRenderer>().material = Colors.ColorsList[ran];
                 iALine.slotsList[i].indexAssignedColor = ran;
-                iALine.slotsList[i].ballSlot.ballGameObject.SetActive(true);
+                iALine.slotsList[i].ballGameObject.SetActive(true);
 
                 iALine.AssignedColorsList.Add(Colors.ColorsList[ran].color);
             }
         }
     }
-    
+    /*
     private void VerifyLine()
     {
         int CorrectSlots = 0;
@@ -379,13 +360,13 @@ public class BoardManager : MonoBehaviour
 
         for (int i = 0; i < board.linesList[currentLine].slotsList.Count; i++)
         {           
-            if (board.linesList[currentLine].slotsList[i].ballSlot.ballGameObject.GetComponent<MeshRenderer>().material.color
-                == iALine.slotsList[i].ballSlot.ballGameObject.GetComponent<MeshRenderer>().material.color)
+            if (board.linesList[currentLine].slotsList[i].ballGameObject.GetComponent<MeshRenderer>().material.color
+                == iALine.slotsList[i].ballGameObject.GetComponent<MeshRenderer>().material.color)
             {               
                 CorrectSlots ++;
 
-                if (usedColorsList.Contains(iALine.slotsList[i].ballSlot.ballGameObject.GetComponent<MeshRenderer>().material.color) == false)                
-                    usedColorsList.Add(iALine.slotsList[i].ballSlot.ballGameObject.GetComponent<MeshRenderer>().material.color);
+                if (usedColorsList.Contains(iALine.slotsList[i].ballGameObject.GetComponent<MeshRenderer>().material.color) == false)                
+                    usedColorsList.Add(iALine.slotsList[i].ballGameObject.GetComponent<MeshRenderer>().material.color);
                 else
                 {
                 //    Repetition++;
@@ -395,12 +376,12 @@ public class BoardManager : MonoBehaviour
             {
                 // color correct but wrong place
                 if (iALine.AssignedColorsList.Contains
-                    (board.linesList[currentLine].slotsList[i].ballSlot.ballGameObject.GetComponent<MeshRenderer>().material.color) == true)
+                    (board.linesList[currentLine].slotsList[i].ballGameObject.GetComponent<MeshRenderer>().material.color) == true)
                 {
                     WrongPlace++;
 
-                    if (usedColorsList.Contains(iALine.slotsList[i].ballSlot.ballGameObject.GetComponent<MeshRenderer>().material.color) == false)
-                        usedColorsList.Add(iALine.slotsList[i].ballSlot.ballGameObject.GetComponent<MeshRenderer>().material.color);
+                    if (usedColorsList.Contains(iALine.slotsList[i].ballGameObject.GetComponent<MeshRenderer>().material.color) == false)
+                        usedColorsList.Add(iALine.slotsList[i].ballGameObject.GetComponent<MeshRenderer>().material.color);
                     else
                     {
                         Repetition++;
@@ -431,12 +412,8 @@ public class BoardManager : MonoBehaviour
                    = Colors.WhiteColor;
 
                 board.linesList[currentLine].miniSlotsXManager.MiniBallSlotsList[i].ballGameObject.SetActive(true);
-            }            
-
-            Debug.Log(CorrectSlots + " / " + WrongPlace + " _ i = " + i
-                    + " _ i + CorrectSlots =" + /*(i + CorrectSlots)*/i1
-                    + " / CorrectSlots + WrongPlace =" + /*(CorrectSlots + WrongPlace)*/i2);
-        }
+            }    
+    }
 
         // win game
         if (CorrectSlots == rules.slotsByLine)
@@ -451,8 +428,8 @@ public class BoardManager : MonoBehaviour
 
         SelectNextLine();
     }
-
-    private void SelectNextLine()
+*/
+    public void SelectNextLine()
     {
         if (currentLine < rules.linesByBoard)
         {
@@ -466,11 +443,11 @@ public class BoardManager : MonoBehaviour
         }
     }
 
-    private void DisableSlot(SlotData slot)
+    public void DisableSlot(SlotData slot)
     {
         // Disable slot
-        AssignDefaultBoardColor(slot.ballSlot.selectedCircle.GetComponent<MeshRenderer>());
-        slot.slotGameObject.GetComponent<Collider>().enabled = false;
+        AssignDefaultBoardColor(slot.selectedCircle.GetComponent<MeshRenderer>());
+        slot.transform.GetComponent<Collider>().enabled = false;
     }
 
     public void ShowOkButton()

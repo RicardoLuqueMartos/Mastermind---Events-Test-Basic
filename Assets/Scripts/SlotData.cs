@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BallSlot : MonoBehaviour, UsableObject
+public class SlotData : MonoBehaviour, UsableObject
 {
     #region Variables
     BoardManager boardManager;
@@ -11,7 +11,9 @@ public class BallSlot : MonoBehaviour, UsableObject
     public GameObject ballGameObject;
     public GameObject selectedCircle;
     public GameObject bar;
+
     public int ballIndex;
+    public int indexAssignedColor;
 
     #endregion Variables
 
@@ -26,14 +28,14 @@ public class BallSlot : MonoBehaviour, UsableObject
         if (boardManager.CurrentSlot != -1)
         {
             boardManager.AssignDefaultBoardColor(boardManager.board.linesList[boardManager.CurrentLine].slotsList
-                [boardManager.CurrentSlot].ballSlot.selectedCircle.GetComponent<MeshRenderer>());
+                [boardManager.CurrentSlot].selectedCircle.GetComponent<MeshRenderer>());
         }
         if (boardManager.CurrentSlot != SlotIndex)
         {
             boardManager.SetCurrentSlot(SlotIndex);
 
             boardManager.AssignSelectionColor(boardManager.board.linesList
-                [boardManager.CurrentLine].slotsList[boardManager.CurrentSlot].ballSlot.selectedCircle.GetComponent<MeshRenderer>());
+                [boardManager.CurrentLine].slotsList[boardManager.CurrentSlot].selectedCircle.GetComponent<MeshRenderer>());
         }
         else boardManager.SetCurrentSlot(-1);
 

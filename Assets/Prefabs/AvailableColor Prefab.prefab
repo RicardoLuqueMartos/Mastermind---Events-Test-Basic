@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1299757920757677358}
   - component: {fileID: 3041968144911514933}
   m_Layer: 0
-  m_Name: AvailableColor Cube
+  m_Name: AvailableColor Prefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

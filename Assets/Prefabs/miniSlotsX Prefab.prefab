@@ -558,7 +558,7 @@ GameObject:
   - component: {fileID: 4739939634735525331}
   - component: {fileID: 3785421957447853215}
   m_Layer: 0
-  m_Name: Small Slots Cube
+  m_Name: miniSlotsX Prefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
