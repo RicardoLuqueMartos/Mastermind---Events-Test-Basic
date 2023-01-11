@@ -13,6 +13,9 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     GameObject LoosePanel;
 
+    [SerializeField]
+    GameObject InGamePanel;
+
     #endregion Variables
 
     void OnEnable()
@@ -27,11 +30,13 @@ public class UIManager : MonoBehaviour
 
     private void ShowWinPanel()
     {       
+        InGamePanel.SetActive(false);        
         WinPanel.SetActive(true);
     }
 
     private void ShowLoosePanel()
-    {       
+    {
+        InGamePanel.SetActive(false);
         LoosePanel.SetActive(true);
     }
 

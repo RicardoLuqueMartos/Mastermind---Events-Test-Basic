@@ -31,4 +31,8 @@ public class LineData : MonoBehaviour
         }
     }
 
+  /*  public int[] GetLineColors()
+    {
+     //   return 
+    }*/
 }

@@ -64,147 +64,12 @@ public class AIController : MonoBehaviour
             }
         }
     }
-    private void VerifyLine() // old method not working properly TO DELETE
-    {
-        VerifiedStatesList.Clear();
-
-        if (boardManager == null)
-            boardManager = FindObjectOfType<BoardManager>();
-
-        int CorrectSlots = 0;
-        int WrongPlace = 0;
-        int currentResultBallsIndex = 0;
-
-        List<Color> usedColorsList = new List<Color>();
-        List<bool> DoublonsList = new List<bool>();
-
-        // prepare doublons list
-        for (int i = 0; i < boardManager.IALine.slotsList.Count; i++)
-        {
-            bool doublon = false;
-            if (usedColorsList.Contains(boardManager.IALine.slotsList[i].GetBallColor())) doublon = true;
-            else usedColorsList.Add(boardManager.IALine.slotsList[i].GetBallColor());
-            DoublonsList.Add(doublon);
-        }
-          
-        for (int i = 0; i < boardManager.Board.linesList[boardManager.CurrentLine].slotsList.Count; i++)
-        {
-            Color iABallColor = boardManager.IALine.slotsList[i].GetBallColor();
-            Color BallColor = boardManager.Board.linesList[boardManager.CurrentLine].slotsList[i].GetBallColor();
-
-            if (BallColor == iABallColor)
-            {
-                VerifiedStateEnum state = VerifiedStateEnum.CorrectPlace;
-                VerifiedStatesList.Add(state);
-                Debug.Log("CorrectPlace " + boardManager.Board.linesList[boardManager.CurrentLine].slotsList[i].name);
-            }
-            else
-            {
-                if (usedColorsList.Contains(BallColor)
-                    && DoublonsList[i] == true)
-                {
-                    VerifiedStateEnum state = VerifiedStateEnum.WrongPlaceColorReused;
-                    VerifiedStatesList.Add(state);
-
-                    Debug.Log("WrongPlaceColorReused "+ boardManager.Board.linesList[boardManager.CurrentLine].slotsList[i].name);
-                }
-                else if (!usedColorsList.Contains(BallColor)
-                    && DoublonsList[i] == false)
-                {
-                    VerifiedStateEnum state = VerifiedStateEnum.WrongPlace;
-                    VerifiedStatesList.Add(state);
-            
-                    Debug.Log("WrongPlace1 "+ boardManager.Board.linesList[boardManager.CurrentLine].slotsList[i].name);
-                }
-                else if (usedColorsList.Contains(BallColor)
-                    && DoublonsList[i] == false)
-                {
-                    VerifiedStateEnum state = VerifiedStateEnum.WrongPlace;
-                    VerifiedStatesList.Add(state);
-
-                    Debug.Log("WrongPlace2 "+ boardManager.Board.linesList[boardManager.CurrentLine].slotsList[i].name);
-                }
-            }
-         /*   if (usedColorsList.Contains(BallColor) == false)
-                usedColorsList.Add(BallColor);
-         */
-            // disable slot
-            boardManager.Board.linesList[boardManager.CurrentLine].slotsList[i].DisableSlot();
-        }
-
-        // prepare result balls
-        for (int i = 0; i < VerifiedStatesList.Count; i++)
-        {
-            if (VerifiedStatesList[i] == VerifiedStateEnum.CorrectPlace) CorrectSlots++;
-            else if (VerifiedStatesList[i] == VerifiedStateEnum.WrongPlaceColorReused
-                || VerifiedStatesList[i] == VerifiedStateEnum.WrongPlace) WrongPlace++;
-        }
-
-        // set mini balls X
-        for (int i = 0; i < CorrectSlots; i++)
-        {
-            boardManager.Board.linesList[boardManager.CurrentLine].miniSlotsXManager.MiniBallSlotsList[i].ballGameObject.GetComponent<MeshRenderer>().material                            
-                = boardManager.Colors.BlackColor;
-
-            boardManager.Board.linesList[boardManager.CurrentLine].miniSlotsXManager.MiniBallSlotsList[i].ballGameObject.SetActive(true);
-
-            currentResultBallsIndex++;
-        }
-
-        for (int i = currentResultBallsIndex; i < currentResultBallsIndex+WrongPlace; i++)
-        {
-            boardManager.Board.linesList[boardManager.CurrentLine].miniSlotsXManager.MiniBallSlotsList[i].ballGameObject.GetComponent<MeshRenderer>().material
-                = boardManager.Colors.WhiteColor;
-
-            boardManager.Board.linesList[boardManager.CurrentLine].miniSlotsXManager.MiniBallSlotsList[i].ballGameObject.SetActive(true);       
-        }
-        /*
-        for (int i = 0; i < boardManager.Board.linesList[boardManager.CurrentLine].miniSlotsXManager.MiniBallSlotsList.Count; i++)
-        {
-            int i1 = (i + CorrectSlots);
-            int i2 = (WrongPlace + CorrectSlots + Repetition);
-
-            if (i2 > 0)
-            {
-                if (i < CorrectSlots)
-                {
-                    boardManager.Board.linesList[boardManager.CurrentLine].miniSlotsXManager.MiniBallSlotsList[i].ballGameObject.GetComponent<MeshRenderer>().material
-                            = boardManager.Colors.BlackColor;
-
-                    boardManager.Board.linesList[boardManager.CurrentLine].miniSlotsXManager.MiniBallSlotsList[i].ballGameObject.SetActive(true);
-                }
-                else if (i1 - 1 < i2)
-                {
-                    boardManager.Board.linesList[boardManager.CurrentLine].miniSlotsXManager.MiniBallSlotsList[i].ballGameObject.GetComponent<MeshRenderer>().material
-                            = boardManager.Colors.WhiteColor;
-
-                    boardManager.Board.linesList[boardManager.CurrentLine].miniSlotsXManager.MiniBallSlotsList[i].ballGameObject.SetActive(true);
-                }
-            }
-       //     Debug.Log(CorrectSlots + " / " + WrongPlace + " / " + Repetition + " _ i = " + i
-        //       + " _ i + CorrectSlots =" + i1 + " / CorrectSlots + WrongPlace + Repetition =" + i2);
-        }
-        */
-
-        // win game ?
-        if (CorrectSlots == boardManager.Rules.slotsByLine)
-        {
-            Win();
-        }
-        else if (boardManager.CurrentLine == boardManager.Rules.linesByBoard
-            && CorrectSlots == boardManager.Rules.slotsByLine)
-        {
-            Loose();
-        }
-        else
-        {
-            GoToNextLine();
-        }
-    }
     public void CheckCode()
     {
         Debug.Log("Verification de ligne");
-        bool[] boolTab = new bool[boardManager.Rules.slotsByLine];
+        bool[] goodColors = new bool[boardManager.Rules.slotsByLine];
+        bool[] WrongPlacement = new bool[boardManager.Rules.slotsByLine];
+        
         int nbGoodColors = 0;
         int nbBadPos = 0;
         int currentResultBallsIndex = 0;
@@ -217,7 +82,7 @@ public class AIController : MonoBehaviour
             if (BallColor == iABallColor)
             {
                 nbGoodColors++;
-                boolTab[i] = true;
+                goodColors[i] = true;
             }
         }
         if (nbGoodColors >= boardManager.Rules.slotsByLine)
@@ -228,25 +93,22 @@ public class AIController : MonoBehaviour
         {
             for (int i = 0; i < boardManager.Rules.slotsByLine; i++)
             {
-             //   if (!boolTab[i])
-              //  {
+                if (!goodColors[i])
+                {
                     Color _BallColor = boardManager.Board.linesList[boardManager.CurrentLine].slotsList[i].GetBallColor(); // la couleur de chaque qui n'est pas ok
 
                     for (int j = 0; j < boardManager.Rules.slotsByLine; j++)
                     {
-                        if (!boolTab[j])
-                        {
-                            Color _iABallColor = boardManager.IALine.slotsList[j].GetBallColor(); // la couleur de chaque de l'ia qui n'est pas ok
+                        Color _iABallColor = boardManager.IALine.slotsList[j].GetBallColor(); // la couleur de chaque de l'ia qui n'est pas ok
 
-                            if (_BallColor == _iABallColor)
-                            {
-                                nbBadPos++;
-                                boolTab[j] = true;
-                                break;
-                            }
-                        }
-                    }
-             //   }
+                        if (_BallColor == _iABallColor && !WrongPlacement[j] && !goodColors[i])
+                        {
+                            nbBadPos++;
+                            WrongPlacement[j] = true;
+                            break;
+                        }                    
+                    }                
+                }
             }
             Debug.Log("nbGoodColors "+ nbGoodColors+ " / nbBadPos " + nbBadPos);
             
@@ -284,7 +146,7 @@ public class AIController : MonoBehaviour
             }
         }
     }
-
+  
     private void GoToNextLine()
     {
         SelectNextLine?.Invoke();
@@ -308,7 +170,6 @@ public class AIController : MonoBehaviour
 
     private void OnDisable()
     {
-     //   ValidateLineButton.ValidateLine -= VerifyLine;
         ValidateLineButton.ValidateLine -= CheckCode;
         BoardManager.BoardGenerated -= Init;
 
