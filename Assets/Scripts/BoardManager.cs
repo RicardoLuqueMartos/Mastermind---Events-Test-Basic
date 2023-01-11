@@ -28,6 +28,7 @@ public class BoardManager : MonoBehaviour
         public List<LineData> linesList = new List<LineData>();
         public GameObject boardGameObject;
         public GameObject OkButtonGameObject;
+        public GameObject DraggedBallGameObject;
 
     }
     [SerializeField]

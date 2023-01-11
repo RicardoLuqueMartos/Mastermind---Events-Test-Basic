@@ -7,12 +7,10 @@ using UnityEngine;
 using UnityEngine.iOS;
 
 public class AIController : MonoBehaviour
-{
-    public enum VerifiedStateEnum { CorrectPlace, WrongPlace, WrongPlaceColorReused, WrongColor }
+{  
+    public enum VerifiedStateEnum { CorrectPlace, WrongPlace, WrongPlaceColorReused, WrongColor } 
     public List<VerifiedStateEnum> VerifiedStatesList = new List<VerifiedStateEnum>();
-
-    [SerializeField] bool UseNewVerification = false;
-
+    
     BoardManager boardManager;
 
     #region Events
@@ -33,24 +31,9 @@ public class AIController : MonoBehaviour
         if (boardManager == null)       
             boardManager = FindObjectOfType<BoardManager>();
 
-        //C# : on inscrit la fonction à l'event
-   /*     if (!UseNewVerification)
-        {
-            ValidateLineButton.ValidateLine += VerifyLine;
-            ValidateLineButton.ValidateLine -= checkCode;
-
-        }
-        else
-        {
-            ValidateLineButton.ValidateLine += checkCode;
-            ValidateLineButton.ValidateLine -= VerifyLine;
-        }*/
-
-        ValidateLineButton.ValidateLine += checkCode;
-
+        ValidateLineButton.ValidateLine += CheckCode;
 
         BoardManager.BoardGenerated += Init;
-
     }
 
     void Init()
@@ -81,7 +64,7 @@ public class AIController : MonoBehaviour
             }
         }
     }
-    private void VerifyLine()
+    private void VerifyLine() // old method not working properly TO DELETE
     {
         VerifiedStatesList.Clear();
 
@@ -218,17 +201,15 @@ public class AIController : MonoBehaviour
             GoToNextLine();
         }
     }
-
-    public void checkCode()
+    public void CheckCode()
     {
         Debug.Log("Verification de ligne");
-        bool[] boolTab = new bool[boardManager.IALine.AssignedColorsList.Count];
+        bool[] boolTab = new bool[boardManager.Rules.slotsByLine];
         int nbGoodColors = 0;
         int nbBadPos = 0;
         int currentResultBallsIndex = 0;
 
-
-        for (int i = 0; i < boardManager.IALine.slotsList.Count; i++)                               //Verification of good colors & positions
+        for (int i = 0; i < boardManager.Rules.slotsByLine; i++) // Verification of good colors & positions
         {
             Color iABallColor = boardManager.IALine.slotsList[i].GetBallColor();
             Color BallColor = boardManager.Board.linesList[boardManager.CurrentLine].slotsList[i].GetBallColor();
@@ -239,25 +220,25 @@ public class AIController : MonoBehaviour
                 boolTab[i] = true;
             }
         }
-        if (nbGoodColors >= boardManager.IALine.slotsList.Count)
+        if (nbGoodColors >= boardManager.Rules.slotsByLine)
         {
             Win();
         }
         else
         {
-            for (int i = 0; i < boardManager.IALine.slotsList.Count; i++)
+            for (int i = 0; i < boardManager.Rules.slotsByLine; i++)
             {
-                if (!boolTab[i])
-                {
-                    Color BallColor = boardManager.Board.linesList[boardManager.CurrentLine].slotsList[i].GetBallColor();
+             //   if (!boolTab[i])
+              //  {
+                    Color _BallColor = boardManager.Board.linesList[boardManager.CurrentLine].slotsList[i].GetBallColor(); // la couleur de chaque qui n'est pas ok
 
-                    for (int j = 0; j < boardManager.IALine.slotsList.Count; j++)
+                    for (int j = 0; j < boardManager.Rules.slotsByLine; j++)
                     {
                         if (!boolTab[j])
                         {
-                            Color iABallColor = boardManager.IALine.slotsList[j].GetBallColor();
+                            Color _iABallColor = boardManager.IALine.slotsList[j].GetBallColor(); // la couleur de chaque de l'ia qui n'est pas ok
 
-                            if (BallColor == iABallColor)
+                            if (_BallColor == _iABallColor)
                             {
                                 nbBadPos++;
                                 boolTab[j] = true;
@@ -265,9 +246,10 @@ public class AIController : MonoBehaviour
                             }
                         }
                     }
-                }
+             //   }
             }
-
+            Debug.Log("nbGoodColors "+ nbGoodColors+ " / nbBadPos " + nbBadPos);
+            
             for (int i = 0; i < nbGoodColors; i++)
             {
                 boardManager.Board.linesList[boardManager.CurrentLine].miniSlotsXManager.MiniBallSlotsList[i].ballGameObject.GetComponent<MeshRenderer>().material
@@ -303,8 +285,6 @@ public class AIController : MonoBehaviour
         }
     }
 
- //   Envoyer un message à @Pronymor
-
     private void GoToNextLine()
     {
         SelectNextLine?.Invoke();
@@ -329,7 +309,7 @@ public class AIController : MonoBehaviour
     private void OnDisable()
     {
      //   ValidateLineButton.ValidateLine -= VerifyLine;
-        ValidateLineButton.ValidateLine -= checkCode;
+        ValidateLineButton.ValidateLine -= CheckCode;
         BoardManager.BoardGenerated -= Init;
 
     }

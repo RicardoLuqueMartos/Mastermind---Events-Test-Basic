@@ -15,6 +15,12 @@ public class AvailableColorSlot : MonoBehaviour, UsableObject
     public int colorIndex;
     #endregion Variables
 
+    void OnEnable()
+    {
+        SlotData.ResetColorsSelection += ResetColorsSelectionLine;
+    }
+
+
     public void UseObject(BoardManager _boardManager) 
     {
         boardManager = _boardManager;
@@ -23,50 +29,70 @@ public class AvailableColorSlot : MonoBehaviour, UsableObject
 
     void SelectColor(int colorIndex)
     {    
-   //     boardManager.ResetColorsSelection();
+        ResetColorsSelection();
 
         if (boardManager.Colors.selectedColorIndex != colorIndex)
         {
             boardManager.Colors.selectedColorIndex = colorIndex;
 
-        //    AssignSelectionColor(boardManager.Colors.GeneratedColorsObjectsList[colorIndex].selectedCircle.GetComponent<MeshRenderer>());
-        }
-        else boardManager.Colors.selectedColorIndex = -1;
+            AssignSelectionColor(boardManager.Colors.GeneratedColorsObjectsList[colorIndex].selectedCircle.GetComponent<MeshRenderer>());
 
-        AssignColorToSlot();
+            HideColorBall();
+            ShowDraggedBall();
+        }
+        else
+        {
+            ShowColorBall();
+            HideDraggedBall();
+            boardManager.Colors.selectedColorIndex = -1;       
+        }
     }
 
-    void AssignColorToSlot()
+    void ShowDraggedBall()
     {
-        if (boardManager.Colors.selectedColorIndex != -1 && boardManager.CurrentSlot != -1)
+        boardManager.Board.DraggedBallGameObject.GetComponent<MeshRenderer>().material = boardManager.Colors.ColorsList[boardManager.Colors.selectedColorIndex];
+        boardManager.Board.DraggedBallGameObject.SetActive(true);
+    }
+
+    void HideDraggedBall()
+    {
+        boardManager.Board.DraggedBallGameObject.SetActive(false);
+    }
+
+    void HideColorBall()
+    {
+        boardManager.Colors.GeneratedColorsObjectsList[boardManager.Colors.selectedColorIndex].ballGameObject.SetActive(false);
+    }
+    void ShowColorBall()
+    {
+        boardManager.Colors.GeneratedColorsObjectsList[boardManager.Colors.selectedColorIndex].ballGameObject.SetActive(true);
+    }
+    private void ResetColorsSelectionLine()
+    {
+        HideDraggedBall();
+        boardManager.Colors.selectedColorIndex = -1;
+        ResetColorsSelection();
+    }
+       
+    private void ResetColorsSelection()
+    {
+        for (int i = 0; i < boardManager.Colors.GeneratedColorsObjectsList.Count; i++)
         {
-            boardManager.Board.linesList[boardManager.CurrentLine].slotsList[boardManager.CurrentSlot].AssignMaterialToBall(
-                boardManager.Colors.ColorsList[boardManager.Colors.GeneratedColorsObjectsList[boardManager.Colors.selectedColorIndex].colorIndex]);
+            boardManager.Colors.GeneratedColorsObjectsList[i].ballGameObject.SetActive(true);
 
-            boardManager.Board.linesList[boardManager.CurrentLine].slotsList[boardManager.CurrentSlot].ActivateBallGameObject();
+            boardManager.Colors.GeneratedColorsObjectsList[i].AssignDefaultBoardColor();
         }
-
-        int ActiveAmount = 0;
-
-        // if all slots done
-        for (int i = 0; i < boardManager.Board.linesList[boardManager.CurrentLine].slotsList.Count; i++)
-        {
-
-            if (boardManager.Board.linesList[boardManager.CurrentLine].slotsList[i].IsBallActiveInHierarchy())
-            {
-                ActiveAmount = ActiveAmount + 1;
-            }
-        }
-
-        if (ActiveAmount == boardManager.Rules.slotsByLine)
-            boardManager.ShowOkButton();
-
     }
 
     public void AssignDefaultBoardColor(BoardManager _boardManager)
     {
         boardManager = _boardManager;
 
+        AssignDefaultBoardColor();
+    }
+     
+    public void AssignDefaultBoardColor()
+    {
         AssignDefaultBoardColor(transform.GetComponent<MeshRenderer>());
         AssignDefaultBoardColor(selectedCircle.GetComponent<MeshRenderer>());
         AssignDefaultBoardColor(bar1.GetComponent<MeshRenderer>());
@@ -81,4 +107,10 @@ public class AvailableColorSlot : MonoBehaviour, UsableObject
     {
         renderer.material = boardManager.Colors.SelectedLineColor;
     }
+
+    void OnDisable()
+    {
+        SlotData.ResetColorsSelection -= ResetColorsSelectionLine;
+    }
+
 }

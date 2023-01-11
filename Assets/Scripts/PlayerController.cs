@@ -6,6 +6,7 @@ public class PlayerController : MonoBehaviour
 {
     RaycastHit hit;
 
+
     // Update is called once per frame
     private void Update()
     {
@@ -24,5 +25,7 @@ public class PlayerController : MonoBehaviour
                     
             }
         }
+
+
     }
 }

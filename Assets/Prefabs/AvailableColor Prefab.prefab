@@ -101,7 +101,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.73, y: 1, z: 0.73}
+  m_Size: {x: 0.9, y: 1, z: 0.9}
   m_Center: {x: 0, y: 0.37, z: 0}
 --- !u!114 &3041968144911514933
 MonoBehaviour:
@@ -115,7 +115,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68cf28098a1e3f5449d511d39013d024, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boardManager: {fileID: 0}
   slot: {fileID: 1299757920757677359}
   ballGameObject: {fileID: 1299757921008687558}
   selectedCircle: {fileID: 1299757920790765515}
