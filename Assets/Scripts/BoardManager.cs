@@ -131,7 +131,7 @@ public class BoardManager : MonoBehaviour
 
     #endregion Init
 
-    #region Generate / Destroy Board
+    #region Generate Destroy Board
     void GenerateBoard()
     {
         // create virtual board
@@ -263,7 +263,7 @@ public class BoardManager : MonoBehaviour
         }
     }
 
-    #endregion Generate / Destroy Board
+    #endregion Generate Destroy Board
 
     #region about Validate button    
     private void PrepareOkButton()

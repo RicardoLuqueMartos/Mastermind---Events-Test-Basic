@@ -20,7 +20,7 @@ public class UIManager : MonoBehaviour
         WinPanel.SetActive(false); 
         LoosePanel.SetActive(false);
 
-        //C# : on inscrit la fonction LooseMessage à l'event
+        //C# : on inscrit la fonction à l'event
         AIController.WinGame += ShowWinPanel;
         AIController.LooseGame += ShowLoosePanel;
     }
