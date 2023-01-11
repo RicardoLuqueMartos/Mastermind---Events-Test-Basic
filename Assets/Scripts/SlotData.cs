@@ -50,11 +50,11 @@ public class SlotData : SlotBase, UsableObject
         AssignDefaultBoardColor(bar.GetComponent<MeshRenderer>());
     }
 
-    public void AssignDefaultBoardColor(MeshRenderer renderer)
+    void AssignDefaultBoardColor(MeshRenderer renderer)
     {
         renderer.material = boardManager.Colors.DefaultBoardColor;
     }
-    public void AssignSelectionColor(MeshRenderer renderer)
+    void AssignSelectionColor(MeshRenderer renderer)
     {
         renderer.material = boardManager.Colors.SelectedLineColor;
     }

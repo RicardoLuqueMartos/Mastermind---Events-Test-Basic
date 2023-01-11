@@ -16,8 +16,8 @@ public class BoardManager : MonoBehaviour
 
     [SerializeField]
     int currentLine = 0;
-     public int CurrentLine { get { return currentLine;  } }
-
+    public int CurrentLine { get { return currentLine; } set { } }
+    
     [SerializeField]
     int currentSlot = -1;
     public int CurrentSlot { get { return currentSlot; } }
@@ -94,9 +94,25 @@ public class BoardManager : MonoBehaviour
     public static event MessageEvent BoardGenerated;
     #endregion variables
 
+    #region Getters & setters
+    public int GetCurrentLineIndex()
+    {
+        return currentLine;
+    }
+    public List<Color> GetCurrentLineContent()
+    {
+        return board.linesList[currentLine].LineColorsList;
+    }
+    public void SetCurrentSlot(int index)
+    {
+        currentSlot = index;
+    }
+
+    #endregion Getters & setters
+
     #region Init
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         GenerateBoard();
         GenerateIABoard();
@@ -106,7 +122,7 @@ public class BoardManager : MonoBehaviour
         BoardGenerated?.Invoke();
     }
 
-    void OnEnable()
+    private void OnEnable()
     {
         GlobalVariables.boardManager = this;
 
@@ -246,16 +262,11 @@ public class BoardManager : MonoBehaviour
             Colors.GeneratedColorsObjectsList.Add(availableColorSlot);
         }
     }
-  
-    
+
     #endregion Generate / Destroy Board
 
-    #region Game Mechanics
-    public void SetCurrentSlot(int index)
-    {
-        currentSlot = index;
-    }   
-    void PrepareOkButton()
+    #region about Validate button    
+    private void PrepareOkButton()
     {
         // prepare position
         Vector3 newPosition = new Vector3(firstSlotPosition.x + (rules.slotsByLine +1), firstSlotPosition.y + currentLine, firstSlotPosition.z);
@@ -274,20 +285,18 @@ public class BoardManager : MonoBehaviour
         board.OkButtonGameObject.SetActive(false);
     }
 
-    #endregion Game Mechanics
-
-    #region IA Exchanges
-    public int GetCurrentLineIndex()
+    public void ShowOkButton()
     {
-        return currentLine;
+        board.OkButtonGameObject.SetActive(true);
     }
 
-     public List<Color> GetCurrentLineContent()
+    private void HideOkButton()
     {
-        return board.linesList[currentLine].LineColorsList;
+        board.OkButtonGameObject.SetActive(false);
     }
+    #endregion about Validate button
 
-    void SelectNextLine()
+    private void SelectNextLine()
     {
         if (currentLine < rules.linesByBoard)
         {
@@ -301,18 +310,6 @@ public class BoardManager : MonoBehaviour
             PrepareOkButton();
         }
     }
-
-    public void ShowOkButton()
-    {
-        board.OkButtonGameObject.SetActive(true);
-    }
-
-    private void HideOkButton()
-    {
-        board.OkButtonGameObject.SetActive(false);
-    }
-
-    #endregion IA Exchanges
 
     private void OnDisable()
     {
