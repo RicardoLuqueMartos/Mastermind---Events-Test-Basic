@@ -50,7 +50,7 @@ public class AvailableColorSlot : MonoBehaviour, UsableObject
 
     void ShowDraggedBall()
     {
-        boardManager.Board.DraggedBallGameObject.GetComponent<MeshRenderer>().material = boardManager.Colors.ColorsList[boardManager.Colors.selectedColorIndex];
+        boardManager.Board.DraggedBallGameObject.GetComponent<MeshRenderer>().material = boardManager.GameSettings.Colors.ColorsList[boardManager.Colors.selectedColorIndex];
         boardManager.Board.DraggedBallGameObject.SetActive(true);
     }
 
@@ -101,11 +101,11 @@ public class AvailableColorSlot : MonoBehaviour, UsableObject
 
     void AssignDefaultBoardColor(MeshRenderer renderer)
     {
-        renderer.material = boardManager.Colors.DefaultBoardColor;
+        renderer.material = boardManager.GameSettings.Colors.DefaultBoardColor;
     }
     void AssignSelectionColor(MeshRenderer renderer)
     {
-        renderer.material = boardManager.Colors.SelectedLineColor;
+        renderer.material = boardManager.GameSettings.Colors.SelectedLineColor;
     }
 
     void OnDisable()

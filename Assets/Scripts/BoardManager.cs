@@ -3,10 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BoardManager : MonoBehaviour
 {
     #region variables
+    [SerializeField]
+    GameSettingsData gameSettings;
+    public GameSettingsData GameSettings { get { return gameSettings; } }
+
     [SerializeField]
     bool testMode = false;
     public bool TestMode { get { return testMode; } }
@@ -33,9 +38,8 @@ public class BoardManager : MonoBehaviour
     }
     [SerializeField]
     BoardData board = new BoardData();
-
     public BoardData Board { get { return board;  } }
-
+       
     [Serializable]
     public class IALineData
     {
@@ -50,41 +54,11 @@ public class BoardManager : MonoBehaviour
     public IALineData IALine { get { return iALine; } }
 
     [Serializable]
-    public class RulesData
-    {
-        public int slotsByLine = 4;
-        public int linesByBoard = 12;
-
-        public bool sameColorByLine = true;
-    }
-    [SerializeField]
-    RulesData rules = new RulesData();
-    public RulesData Rules { get { return rules; } }
-
-    [Serializable]
-    public class PrefabsData
-    {
-        public GameObject slotPrefab;
-        public GameObject slotX4Prefab;
-        public GameObject colorChoicePrefab;
-        public GameObject OkButtonPrefab;
-    }
-    [SerializeField]
-    PrefabsData prefabs = new PrefabsData();
-
-    [Serializable]
     public class ColorsData
     {
-        public int maxColors = 6;
         public int selectedColorIndex = -1;
         public int PreviousSelectedColorIndex = -1;
-        public List<Material> ColorsList = new List<Material>();
         public List<AvailableColorSlot> GeneratedColorsObjectsList = new List<AvailableColorSlot>();
-        public Material DefaultBoardColor;
-        public Material SelectedLineColor;
-        public Material WhiteColor;
-        public Material BlackColor;
-
     }
     [SerializeField] 
     ColorsData colors = new ColorsData();
@@ -93,6 +67,7 @@ public class BoardManager : MonoBehaviour
 
     public delegate void MessageEvent();
     public static event MessageEvent BoardGenerated;
+    public static event MessageEvent GameStarted;
     #endregion variables
 
     #region Getters & setters
@@ -115,12 +90,7 @@ public class BoardManager : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-        GenerateBoard();
-        GenerateIABoard();
-
-        GenerateColorsChoicesBoard();
-
-        BoardGenerated?.Invoke();
+        
     }
 
     private void OnEnable()
@@ -133,6 +103,18 @@ public class BoardManager : MonoBehaviour
     #endregion Init
 
     #region Generate Destroy Board
+
+    public void StartGame()
+    {
+        GenerateBoard();
+        GenerateIABoard();
+
+        GenerateColorsChoicesBoard();
+
+        BoardGenerated?.Invoke();
+        GameStarted?.Invoke();
+    }
+
     void GenerateBoard()
     {
         // create virtual board
@@ -140,7 +122,7 @@ public class BoardManager : MonoBehaviour
         board.boardGameObject.name = "board";
         board.boardGameObject.transform.SetParent(transform);
 
-        for (int iLine = 0; iLine < rules.linesByBoard; iLine++)
+        for (int iLine = 0; iLine < GameSettings.Rules.linesByBoard; iLine++)
         {            
             // create a line
             GameObject newlineObj = new GameObject();
@@ -151,13 +133,13 @@ public class BoardManager : MonoBehaviour
             board.linesList.Add(newline);
 
 
-            for (int iSlot = 0; iSlot < rules.slotsByLine; iSlot++)
+            for (int iSlot = 0; iSlot < GameSettings.Rules.slotsByLine; iSlot++)
             {
               
                 Vector3 newPosition = new Vector3(firstSlotPosition.x+iSlot, firstSlotPosition.y+iLine, firstSlotPosition.z);
 
                 // create object in scene
-                GameObject newSlotObj = (GameObject)Instantiate(prefabs.slotPrefab, newPosition, prefabs.slotPrefab.transform.rotation,
+                GameObject newSlotObj = (GameObject)Instantiate(GameSettings.Prefabs.slotPrefab, newPosition, GameSettings.Prefabs.slotPrefab.transform.rotation,
                      newlineObj.transform);
                 SlotData newSlot = newSlotObj.GetComponent<SlotData>();
                 newSlotObj.name = "Ball Slot " + iSlot;
@@ -174,36 +156,73 @@ public class BoardManager : MonoBehaviour
                 newSlot.DisactivateBallGameObject();
 
                 // generate MiniSlotsX
-                if (iSlot == rules.slotsByLine-1)
+                if (iSlot == GameSettings.Rules.slotsByLine-1)
                 {
-                   // prepare position
-                    Vector3 newPosition2 = new Vector3(firstSlotPosition.x + (iSlot + 1), firstSlotPosition.y + iLine, firstSlotPosition.z);
+                    int neededSlotX4Prefab = 1;
+                    if (GameSettings.Rules.slotsByLine > 4) neededSlotX4Prefab = 2;
 
-                    // instantiate object
-                    GameObject slotGameObject = (GameObject)Instantiate(prefabs.slotX4Prefab, newPosition2, 
-                        prefabs.slotX4Prefab.transform.rotation,
-                       newlineObj.transform);
-                    slotGameObject.name = "MiniSlotsX";
-
-                    newline.miniSlotsXManager = slotGameObject.GetComponent<MiniSlotsXManager>();
-
-                    // set color
-                    newline.miniSlotsXManager.AssignDefaultBoardColor(this);
-
-
-                    for (int iminiSlot = 0; iminiSlot < newline.miniSlotsXManager.MiniBallSlotsList.Count; iminiSlot++)
+                    for (int i3 = 0; i3 < neededSlotX4Prefab; i3++)
                     {
-                        newline.miniSlotsXManager.MiniBallSlotsList[iminiSlot].selectedCircle.transform.GetComponent<MeshRenderer>().material 
-                            = Colors.DefaultBoardColor;
+                        // prepare position
+                        Vector3 newPosition2 = new Vector3(firstSlotPosition.x + (iSlot + 1+i3), firstSlotPosition.y + iLine, firstSlotPosition.z);
 
-                        newline.miniSlotsXManager.MiniBallSlotsList[iminiSlot].ballGameObject.SetActive(false);
+                        // instantiate object
+                        GameObject slotGameObject = (GameObject)Instantiate(GameSettings.Prefabs.slotX4Prefab, newPosition2,
+                            GameSettings.Prefabs.slotX4Prefab.transform.rotation,
+                           newlineObj.transform);
+                        slotGameObject.name = "MiniSlotsX";
+
+                        if (i3 == 0)                        
+                            newline.miniSlotsXManager = slotGameObject.GetComponent<MiniSlotsXManager>();
+                         
+
+                        // set color
+                        newline.miniSlotsXManager.AssignDefaultBoardColor(this);
+
+                        if (i3 > 0)
+                        {
+                            slotGameObject.GetComponent<MiniSlotsXManager>().AssignDefaultBoardColor(this);
+                            slotGameObject.GetComponent<MiniSlotsXManager>().bar.SetActive(false);
+
+                            for (int iminiSlot = 0; iminiSlot < 4; iminiSlot++)
+                            {
+                                if (iminiSlot < GameSettings.Rules.slotsByLine - 4)
+                                {
+                                    slotGameObject.GetComponent<MiniSlotsXManager>().MiniBallSlotsList[iminiSlot].selectedCircle.transform.GetComponent<MeshRenderer>().material
+                                        = GameSettings.Colors.DefaultBoardColor;
+
+                                    slotGameObject.GetComponent<MiniSlotsXManager>().MiniBallSlotsList[iminiSlot].ballGameObject.SetActive(false);
+
+                                    MiniBallSlot miniBallSlot = slotGameObject.GetComponent<MiniSlotsXManager>().MiniBallSlotsList[iminiSlot];
+
+                                    // add it to the first manager
+                                    newline.miniSlotsXManager.MiniBallSlotsList.Insert(iminiSlot + 2 , miniBallSlot);
+                                 //   slotGameObject.GetComponent<MiniSlotsXManager>().MiniBallSlotsList.Remove(miniBallSlot);
+                                }
+                                else
+                                {
+                                    // remove the unused minislot
+                                    Destroy(slotGameObject.GetComponent<MiniSlotsXManager>().MiniBallSlotsList[iminiSlot].gameObject);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            newline.miniSlotsXManager.bar.SetActive(false);
+
+                            for (int iminiSlot = 0; iminiSlot < newline.miniSlotsXManager.MiniBallSlotsList.Count; iminiSlot++)
+                            {
+                                newline.miniSlotsXManager.MiniBallSlotsList[iminiSlot].selectedCircle.transform.GetComponent<MeshRenderer>().material
+                                    = GameSettings.Colors.DefaultBoardColor;
+
+                                newline.miniSlotsXManager.MiniBallSlotsList[iminiSlot].ballGameObject.SetActive(false);
+                            }
+                        }
+                        // show object
+                        slotGameObject.SetActive(true);
                     }
-
-                    // show object
-                    slotGameObject.SetActive(true);
                 }
-            }
-                     
+            }                     
             if (iLine == 0) newline.SetCurrentLineSelected(this);
         }
 
@@ -217,13 +236,13 @@ public class BoardManager : MonoBehaviour
         iALine.iALineGameObject.name = "IA Line";
         iALine.iALineGameObject.transform.SetParent(transform);
 
-        for (int iSlot = 0; iSlot < rules.slotsByLine; iSlot++)
+        for (int iSlot = 0; iSlot < GameSettings.Rules.slotsByLine; iSlot++)
         {          
             // prepare position
-            Vector3 newPosition = new Vector3(firstSlotPosition.x + iSlot, firstSlotPosition.y + (rules.linesByBoard+1), firstSlotPosition.z);
+            Vector3 newPosition = new Vector3(firstSlotPosition.x + iSlot, firstSlotPosition.y + (GameSettings.Rules.linesByBoard+1), firstSlotPosition.z);
 
             // create object in scene
-            GameObject newSlotObj = (GameObject)Instantiate(prefabs.slotPrefab, newPosition, prefabs.slotPrefab.transform.rotation,
+            GameObject newSlotObj = (GameObject)Instantiate(GameSettings.Prefabs.slotPrefab, newPosition, GameSettings.Prefabs.slotPrefab.transform.rotation,
                 iALine.iALineGameObject.transform);
 
             SlotData newSlot = newSlotObj.GetComponent<SlotData>();
@@ -241,24 +260,24 @@ public class BoardManager : MonoBehaviour
         AvailableColors.transform.SetParent(board.boardGameObject.transform);
         AvailableColors.name = "Available Colors";
 
-        for (int iSlot = 0; iSlot < Colors.ColorsList.Count; iSlot++)
+        for (int iSlot = 0; iSlot < GameSettings.Colors.maxColors; iSlot++)
         {
             // prepare position
             Vector3 newPosition = new Vector3(firstSlotPosition.x -2, firstSlotPosition.y + iSlot, firstSlotPosition.z);
 
             // create object in scene
-            GameObject slot = (GameObject)Instantiate(prefabs.colorChoicePrefab, newPosition, prefabs.colorChoicePrefab.transform.rotation,
+            GameObject slot = (GameObject)Instantiate(GameSettings.Prefabs.colorChoicePrefab, newPosition, GameSettings.Prefabs.colorChoicePrefab.transform.rotation,
                 AvailableColors.transform);
 
             AvailableColorSlot availableColorSlot = slot.GetComponent<AvailableColorSlot>();
-            availableColorSlot.slot.name = Colors.ColorsList[iSlot].name;
+            availableColorSlot.slot.name = GameSettings.Colors.ColorsList[iSlot].name;
             availableColorSlot.colorIndex = iSlot;
 
             // set color
             availableColorSlot.AssignDefaultBoardColor(this);
 
             // set color for the ball
-            availableColorSlot.ballGameObject.GetComponent<Renderer>().material = Colors.ColorsList[iSlot];
+            availableColorSlot.ballGameObject.GetComponent<Renderer>().material = GameSettings.Colors.ColorsList[iSlot];
 
             Colors.GeneratedColorsObjectsList.Add(availableColorSlot);
         }
@@ -270,12 +289,13 @@ public class BoardManager : MonoBehaviour
     private void PrepareOkButton()
     {
         // prepare position
-        Vector3 newPosition = new Vector3(firstSlotPosition.x + (rules.slotsByLine +1), firstSlotPosition.y + currentLine, firstSlotPosition.z);
+        Vector3 newPosition = new Vector3(firstSlotPosition.x + (GameSettings.Rules.slotsByLine 
+            +( GameSettings.Rules.slotsByLine / 4 )+ 1), firstSlotPosition.y + currentLine, firstSlotPosition.z);
 
         // create object in scene
         if (board.OkButtonGameObject == null)
         {
-            board.OkButtonGameObject = (GameObject)Instantiate(prefabs.OkButtonPrefab, newPosition, prefabs.OkButtonPrefab.transform.rotation,
+            board.OkButtonGameObject = (GameObject)Instantiate(GameSettings.Prefabs.OkButtonPrefab, newPosition, GameSettings.Prefabs.OkButtonPrefab.transform.rotation,
             board.boardGameObject.transform);
         }
         else
@@ -299,7 +319,7 @@ public class BoardManager : MonoBehaviour
 
     private void SelectNextLine()
     {
-        if (currentLine < rules.linesByBoard)
+        if (currentLine < GameSettings.Rules.linesByBoard)
         {
             board.linesList[currentLine].SetCurrentLineUnselected(this);
 

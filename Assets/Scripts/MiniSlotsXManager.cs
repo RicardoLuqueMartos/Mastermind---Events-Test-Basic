@@ -19,10 +19,10 @@ public class MiniSlotsXManager : MonoBehaviour
 
     public void AssignDefaultBoardColor(MeshRenderer renderer)
     {
-        renderer.material = boardManager.Colors.DefaultBoardColor;
+        renderer.material = boardManager.GameSettings.Colors.DefaultBoardColor;
     }
     public void AssignSelectionColor(MeshRenderer renderer)
     {
-        renderer.material = boardManager.Colors.SelectedLineColor;
+        renderer.material = boardManager.GameSettings.Colors.SelectedLineColor;
     }
 }

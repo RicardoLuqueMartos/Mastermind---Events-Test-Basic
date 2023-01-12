@@ -17,7 +17,7 @@ public class LineData : MonoBehaviour
 
         for (int i = 0; i < slotsList.Count; i++)
         {
-            slotsList[i].transform.GetComponent<MeshRenderer>().material = boardManager.Colors.SelectedLineColor;
+            slotsList[i].transform.GetComponent<MeshRenderer>().material = boardManager.GameSettings.Colors.SelectedLineColor;
         }
     }
 
@@ -27,7 +27,7 @@ public class LineData : MonoBehaviour
 
         for (int i = 0; i < slotsList.Count; i++)
         {
-            slotsList[i].transform.GetComponent<MeshRenderer>().material = boardManager.Colors.DefaultBoardColor;
+            slotsList[i].transform.GetComponent<MeshRenderer>().material = boardManager.GameSettings.Colors.DefaultBoardColor;
         }
     }
 

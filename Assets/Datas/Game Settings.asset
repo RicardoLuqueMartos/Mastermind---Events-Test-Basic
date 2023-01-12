@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c9dde691000e4f49a1e4feed2cee892, type: 3}
+  m_Name: Game Settings
+  m_EditorClassIdentifier: 
+  colors:
+    maxColors: 6
+    ColorsList:
+    - {fileID: 2100000, guid: 6eebe75bac771a8419ceddee86254104, type: 2}
+    - {fileID: 2100000, guid: ae5fac00dc6c619459c1b34f239674f4, type: 2}
+    - {fileID: 2100000, guid: 8345cabd1fca7874f87c34e9bfe82fcd, type: 2}
+    - {fileID: 2100000, guid: bf83b1af18dc96746bbf3e46b072fdee, type: 2}
+    - {fileID: 2100000, guid: ad53c4fa5d39ddd449a0927f0ac9d9d5, type: 2}
+    - {fileID: 2100000, guid: bc287b89451d02a4eac9e75767175151, type: 2}
+    - {fileID: 2100000, guid: db4bbaa25ff9fea4780998729a23afa3, type: 2}
+    - {fileID: 2100000, guid: 0ef85397c029ad441baf270d9a9616fd, type: 2}
+    - {fileID: 2100000, guid: e8d7ac0ec0d4f0c42b1adcb2c8e8aa24, type: 2}
+    - {fileID: 2100000, guid: 0ffa606ea344c3243b1281c4f618cd67, type: 2}
+    DefaultBoardColor: {fileID: 2100000, guid: 56869997d955e724792b01342c65c4f0, type: 2}
+    SelectedLineColor: {fileID: 2100000, guid: 553e2e4660684544b89d3eb026339f01, type: 2}
+    WhiteColor: {fileID: 2100000, guid: 2d6e0c946da54f841af36216ced76378, type: 2}
+    BlackColor: {fileID: 2100000, guid: 0fb3e3813d4296843bb2c16c7eb6233f, type: 2}
+  prefabs:
+    slotPrefab: {fileID: 1025038223755965807, guid: ecbf1bc93cf35b2438fd4985b6f430bb, type: 3}
+    slotX4Prefab: {fileID: 4739939634735525330, guid: 18f9ccda97f7f0948aec6601f2e714ec, type: 3}
+    colorChoicePrefab: {fileID: 1299757920757677359, guid: 023a8fd65fa9ba3408652ec6e27bf128, type: 3}
+    OkButtonPrefab: {fileID: 7439644160589298923, guid: 64af1d29325621f438a6283847ea0a1c, type: 3}
+  rules:
+    slotsByLine: 4
+    linesByBoard: 12
+    sameColorByLine: 1

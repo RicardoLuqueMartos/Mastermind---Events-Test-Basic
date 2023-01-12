@@ -43,7 +43,7 @@ public class SlotData : SlotBase, UsableObject
         if (boardManager.Colors.selectedColorIndex != -1 && boardManager.CurrentSlot != -1)
         {
             boardManager.Board.linesList[boardManager.CurrentLine].slotsList[boardManager.CurrentSlot].AssignMaterialToBall(
-                boardManager.Colors.ColorsList[boardManager.Colors.GeneratedColorsObjectsList[boardManager.Colors.selectedColorIndex].colorIndex]);
+                boardManager.GameSettings.Colors.ColorsList[boardManager.Colors.GeneratedColorsObjectsList[boardManager.Colors.selectedColorIndex].colorIndex]);
 
             boardManager.Board.linesList[boardManager.CurrentLine].slotsList[boardManager.CurrentSlot].ActivateBallGameObject();
 
@@ -61,7 +61,7 @@ public class SlotData : SlotBase, UsableObject
             }
         }
 
-        if (ActiveAmount == boardManager.Rules.slotsByLine)
+        if (ActiveAmount == boardManager.GameSettings.Rules.slotsByLine)
             boardManager.ShowOkButton();
 
     }
@@ -84,10 +84,10 @@ public class SlotData : SlotBase, UsableObject
 
     void AssignDefaultBoardColor(MeshRenderer renderer)
     {
-        renderer.material = boardManager.Colors.DefaultBoardColor;
+        renderer.material = boardManager.GameSettings.Colors.DefaultBoardColor;
     }
     void AssignSelectionColor(MeshRenderer renderer)
     {
-        renderer.material = boardManager.Colors.SelectedLineColor;
+        renderer.material = boardManager.GameSettings.Colors.SelectedLineColor;
     }
 }

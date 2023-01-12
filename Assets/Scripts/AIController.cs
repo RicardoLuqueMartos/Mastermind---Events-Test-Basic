@@ -50,31 +50,31 @@ public class AIController : MonoBehaviour
     }
     public void GenerateCode()
     {
-        for (int i = 0; i < boardManager.Rules.slotsByLine; i++)
+        for (int i = 0; i < boardManager.GameSettings.Rules.slotsByLine; i++)
         {
-            if (boardManager.Colors.ColorsList.Count > 0)
+            if (boardManager.GameSettings.Colors.maxColors > 0)
             {
                 // ran material
-                int ran = UnityEngine.Random.Range(1, boardManager.Colors.ColorsList.Count);
-                boardManager.IALine.slotsList[i].AssignMaterialToBall(boardManager.Colors.ColorsList[ran]);
+                int ran = UnityEngine.Random.Range(1, boardManager.GameSettings.Colors.maxColors);
+                boardManager.IALine.slotsList[i].AssignMaterialToBall(boardManager.GameSettings.Colors.ColorsList[ran]);
                 boardManager.IALine.slotsList[i].indexAssignedColor = ran;
                 boardManager.IALine.slotsList[i].ActivateBallGameObject();
 
-                boardManager.IALine.AssignedColorsList.Add(boardManager.Colors.ColorsList[ran].color);
+                boardManager.IALine.AssignedColorsList.Add(boardManager.GameSettings.Colors.ColorsList[ran].color);
             }
         }
     }
     public void CheckCode()
     {
         Debug.Log("Verification de ligne");
-        bool[] goodColors = new bool[boardManager.Rules.slotsByLine];
-        bool[] WrongPlacement = new bool[boardManager.Rules.slotsByLine];
+        bool[] goodColors = new bool[boardManager.GameSettings.Rules.slotsByLine];
+        bool[] WrongPlacement = new bool[boardManager.GameSettings.Rules.slotsByLine];
         
         int nbGoodColors = 0;
         int nbBadPos = 0;
         int currentResultBallsIndex = 0;
 
-        for (int i = 0; i < boardManager.Rules.slotsByLine; i++) // Verification of good colors & positions
+        for (int i = 0; i < boardManager.GameSettings.Rules.slotsByLine; i++) // Verification of good colors & positions
         {
             Color iABallColor = boardManager.IALine.slotsList[i].GetBallColor();
             Color BallColor = boardManager.Board.linesList[boardManager.CurrentLine].slotsList[i].GetBallColor();
@@ -85,19 +85,19 @@ public class AIController : MonoBehaviour
                 goodColors[i] = true;
             }
         }
-        if (nbGoodColors >= boardManager.Rules.slotsByLine)
+        if (nbGoodColors >= boardManager.GameSettings.Rules.slotsByLine)
         {
             Win();
         }
         else
         {
-            for (int i = 0; i < boardManager.Rules.slotsByLine; i++)
+            for (int i = 0; i < boardManager.GameSettings.Rules.slotsByLine; i++)
             {
                 if (!goodColors[i])
                 {
                     Color _BallColor = boardManager.Board.linesList[boardManager.CurrentLine].slotsList[i].GetBallColor(); // la couleur de chaque qui n'est pas ok
 
-                    for (int j = 0; j < boardManager.Rules.slotsByLine; j++)
+                    for (int j = 0; j < boardManager.GameSettings.Rules.slotsByLine; j++)
                     {
                         Color _iABallColor = boardManager.IALine.slotsList[j].GetBallColor(); // la couleur de chaque de l'ia qui n'est pas ok
 
@@ -115,7 +115,7 @@ public class AIController : MonoBehaviour
             for (int i = 0; i < nbGoodColors; i++)
             {
                 boardManager.Board.linesList[boardManager.CurrentLine].miniSlotsXManager.MiniBallSlotsList[i].ballGameObject.GetComponent<MeshRenderer>().material
-                    = boardManager.Colors.BlackColor;
+                    = boardManager.GameSettings.Colors.BlackColor;
 
                 boardManager.Board.linesList[boardManager.CurrentLine].miniSlotsXManager.MiniBallSlotsList[i].ballGameObject.SetActive(true);
 
@@ -125,18 +125,18 @@ public class AIController : MonoBehaviour
             for (int i = currentResultBallsIndex; i < currentResultBallsIndex + nbBadPos; i++)
             {
                 boardManager.Board.linesList[boardManager.CurrentLine].miniSlotsXManager.MiniBallSlotsList[i].ballGameObject.GetComponent<MeshRenderer>().material
-                    = boardManager.Colors.WhiteColor;
+                    = boardManager.GameSettings.Colors.WhiteColor;
 
                 boardManager.Board.linesList[boardManager.CurrentLine].miniSlotsXManager.MiniBallSlotsList[i].ballGameObject.SetActive(true);
             }
 
             // win game ?
-            if (nbGoodColors == boardManager.Rules.slotsByLine)
+            if (nbGoodColors == boardManager.GameSettings.Rules.slotsByLine)
             {
                 Win();
             }
-            else if (boardManager.CurrentLine == boardManager.Rules.linesByBoard
-                && nbGoodColors == boardManager.Rules.slotsByLine)
+            else if (boardManager.CurrentLine == boardManager.GameSettings.Rules.linesByBoard
+                && nbGoodColors == boardManager.GameSettings.Rules.slotsByLine)
             {
                 Loose();
             }

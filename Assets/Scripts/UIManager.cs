@@ -16,6 +16,9 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     GameObject InGamePanel;
 
+    [SerializeField]
+    GameObject StartMenuPanel;
+
     #endregion Variables
 
     void OnEnable()
@@ -26,6 +29,23 @@ public class UIManager : MonoBehaviour
         //C# : on inscrit la fonction à l'event
         AIController.WinGame += ShowWinPanel;
         AIController.LooseGame += ShowLoosePanel;
+        BoardManager.GameStarted += StartGameUI;
+    }
+
+    void StartGameUI()
+    {
+        HideStartMenu();
+        ShowGameUI();
+    }
+
+    void HideStartMenu()
+    {
+        StartMenuPanel.SetActive(false);
+    }
+
+    void ShowGameUI()
+    {
+        InGamePanel.SetActive(true);
     }
 
     private void ShowWinPanel()
@@ -54,5 +74,7 @@ public class UIManager : MonoBehaviour
     {
         AIController.WinGame -= ShowWinPanel;
         AIController.LooseGame -= ShowLoosePanel;
+        BoardManager.GameStarted -= StartGameUI;
+
     }
 }
