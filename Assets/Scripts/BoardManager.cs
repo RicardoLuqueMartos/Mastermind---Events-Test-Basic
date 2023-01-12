@@ -132,10 +132,8 @@ public class BoardManager : MonoBehaviour
 
             board.linesList.Add(newline);
 
-
             for (int iSlot = 0; iSlot < GameSettings.Rules.slotsByLine; iSlot++)
-            {
-              
+            {              
                 Vector3 newPosition = new Vector3(firstSlotPosition.x+iSlot, firstSlotPosition.y+iLine, firstSlotPosition.z);
 
                 // create object in scene
