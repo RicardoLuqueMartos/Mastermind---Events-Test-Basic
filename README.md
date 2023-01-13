@@ -1,2 +1,3 @@
 # Mastermind---Events-Test-Basic
-A simple exemple on how to proceduraly create a Mastermind board and to use events
+
+A procedural Mastermind board game with difficulty customization using 3 factors.
